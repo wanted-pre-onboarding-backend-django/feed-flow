@@ -1,5 +1,5 @@
 from django.db import models
-from ...config.models import BaseModel
+from config.models import BaseModel
 
 
 class Hashtag(BaseModel):

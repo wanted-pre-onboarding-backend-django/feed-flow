@@ -1,8 +1,7 @@
 from django.db import models
-from ..config.models import BaseModel
+from config.models import BaseModel
 
 
-# Create your models here.
 class User(BaseModel):
     """User Model Definition"""
 

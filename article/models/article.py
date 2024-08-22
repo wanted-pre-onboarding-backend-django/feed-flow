@@ -1,8 +1,7 @@
 from django.db import models
-from ...config.models import BaseModel
-
-
-# Create your models here.
+from config.models import BaseModel
+from user.models import User
+from .hashtag import Hashtag
 
 
 class Article(BaseModel):
@@ -23,10 +22,8 @@ class Article(BaseModel):
     like_cnt = models.PositiveIntegerField(default=0, verbose_name="좋아요 수")
     share_cnt = models.PositiveIntegerField(default=0, verbose_name="공유 횟수")
 
-    user = models.ForeignKey(
-        "users.User", on_delete=models.CASCADE, verbose_name="사용자_id"
-    )
-    hashtag = models.ManyToManyField("rooms.Amenity", verbose_name="해시태그_id")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="사용자_id")
+    hashtag = models.ManyToManyField(Hashtag, verbose_name="해시태그_id")
 
     class Meta:
         """Meta definition for Article."""
