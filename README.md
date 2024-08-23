@@ -40,7 +40,7 @@ SECRET_KEY=your-secret-key
 > flake8
 
 # 가상환경 종료
-> deactivate
+> exit
 
 # 가상환경 삭제
 > pipenv --rm

@@ -2,6 +2,8 @@ from django.db import models
 
 
 class BaseModel(models.Model):
+    """Base Model Definiton"""
+
     class Meta:
         abstract = True
 
