@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 
-from models import Article
+from article.models import Article
 
 
 class ArticleLikeAPIView(APIView):
