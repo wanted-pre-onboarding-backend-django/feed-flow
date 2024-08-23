@@ -40,14 +40,17 @@ class ArticleLikeAPIView(APIView):
 
         # 에러 처리
         except ValidationError as e:
+            # 잘못된 요청 시(400)
             return Response({"msg": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         except Article.DoesNotExist:
+            # 해당 article 찾지 못했을 시(404)
             return Response(
                 {"msg": "해당하는 게시글이 없습니다."}, status=status.HTTP_404_NOT_FOUND
             )
 
         except Exception as e:
+            # 그 외 예외 처리(500)
             return Response(
                 {"msg": f"{str(e)} 오류가 발생했습니다. 다시 시도해주세요."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
