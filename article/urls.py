@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from .views import ArticleLikeAPIView
+from article.views import ArticleLikeAPIView
 
 app_name = "article"
 router = DefaultRouter()

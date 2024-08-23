@@ -1,1 +1,1 @@
-from article_like_views import ArticleLikeAPIView
+from .article_like_views import ArticleLikeAPIView
