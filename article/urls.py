@@ -8,7 +8,7 @@ router = DefaultRouter()
 
 urlpatterns = [
     path(
-        "articles/<int:article_id>/like/",
+        "<int:article_id>/like/",
         ArticleLikeAPIView.as_view(),
         name="article-like",
     )
