@@ -1,3 +1,4 @@
+from django.http import Http404
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
@@ -9,7 +10,7 @@ from article.models import Article
 
 
 class ArticleLikeAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def patch(self, request, *args, **kwargs):
         """
@@ -21,15 +22,21 @@ class ArticleLikeAPIView(APIView):
         """
         try:
             # path param으로 article_id 추출
-            article_id = kwargs.get("id")
+            article_id = kwargs.get("article_id")
 
             # 게시글 id가 전달되지 않을 시, 오류
             if not article_id:
-                raise ValidationError("게시글 번호가 필요합니다.")
+                raise ValidationError()
 
             # 해당하는 article 객체 조회
             # 없을 시, 404 Error 발생
-            article = get_object_or_404(Article, id=article_id)
+            try:
+                article = get_object_or_404(Article, id=article_id)
+            except Http404:
+                return Response(
+                    {"msg": "해당하는 게시글이 없습니다."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
             # like_cnt 증가
             article.like_cnt += 1
@@ -41,12 +48,9 @@ class ArticleLikeAPIView(APIView):
         # 에러 처리
         except ValidationError as e:
             # 잘못된 요청 시(400)
-            return Response({"msg": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-        except Article.DoesNotExist:
-            # 해당 article 찾지 못했을 시(404)
             return Response(
-                {"msg": "해당하는 게시글이 없습니다."}, status=status.HTTP_404_NOT_FOUND
+                {"msg": f"{e.detail} 게시글 번호가 필요합니다."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         except Exception as e:
