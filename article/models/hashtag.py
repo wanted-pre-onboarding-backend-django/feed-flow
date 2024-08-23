@@ -6,7 +6,11 @@ class Hashtag(BaseModel):
     """Hashtag Model Definiton"""
 
     name = models.CharField(
-        max_length=50, unique=True, null=False, blank=False, verbose_name="해시태그명"
+        max_length=50,
+        unique=True,
+        null=False,
+        blank=False,
+        verbose_name="해시태그명",
     )
 
     class Meta:
