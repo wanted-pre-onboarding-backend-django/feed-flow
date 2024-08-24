@@ -11,16 +11,16 @@ from article.models import Article
 from article.utils.article_site_dict import article_site_dict
 
 
-class ArticleLikeAPIView(APIView):
+class ArticleShareAPIView(APIView):
     # permission_classes = [IsAuthenticated]
 
-    def patch(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         """
-        PATCH : /articles/:id/like/
-        게시물 좋아요 버튼 클릭 시, like_cnt 1씩 증가
+        GET : /articles/:id/share/
+        게시물 공유 버튼 클릭 시, share_cnt 1씩 증가
 
         TODO: 나중에 에러 메시지 한 파일에 모아서 관리할 것
-        TODO: 해당하는 사이트의 좋아요 기능과 연결하기
+        TODO: 해당하는 사이트의 공유 기능과 연결하기
         """
         try:
             # path param으로 article_id 추출
@@ -44,7 +44,7 @@ class ArticleLikeAPIView(APIView):
             # 현재는 주석 처리
             # url = ""
             # if article.type in article_site_dict:
-            #     url = article_site_dict[article.type] + f"/like/{article.content_id}"
+            #     url = article_site_dict[article.type] + f"/share/{article.content_id}"
             # else:
             #     return Response(
             #         {"msg": "존재하지 않는 사이트입니다."},
@@ -55,16 +55,16 @@ class ArticleLikeAPIView(APIView):
             # response = requests.post(url)
             # if response.status_code != 200:
             #     return Response(
-            #         {"msg": "해당 사이트의 좋아요 작업에 실패했습니다."},
+            #         {"msg": "해당 사이트와의 공유 작업에 실패했습니다."},
             #         status=status.HTTP_500_INTERNAL_SERVER_ERROR
             #     )
 
-            # like_cnt 증가
-            article.like_cnt += 1
+            # share_cnt 증가
+            article.share_cnt += 1
             article.save()
 
-            # 성공 시, 204 응답
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            # 성공 시, 200 응답
+            return Response(status=status.HTTP_200_OK)
 
         # 에러 처리
         except ValidationError as e:
