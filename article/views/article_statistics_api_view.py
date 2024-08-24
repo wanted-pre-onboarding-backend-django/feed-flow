@@ -44,6 +44,8 @@ class StatisticsAPIView(APIView):
                 aggregation_type = serializer.validated_data['type']
                 start_date = serializer.validated_data['start']
                 end_date = serializer.validated_data['end']
+
+                queryset = self.get_filtered_queryset(start_date, end_date, hashtag)
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
             except Exception as e:
@@ -51,3 +53,13 @@ class StatisticsAPIView(APIView):
                 return Response({"detail": "An error occurred while processing your request."}, status=500)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_filtered_queryset(self, start_date, end_date, hashtag):
+        """
+        주어진 날짜 범위와 해시태그에 따라 필터링된 게시물의 QuerySet을 반환합니다.
+        """
+        q = Q(created_at__range=(start_date, end_date)) & Q(hashtag__name=hashtag)
+        filtered_queryset = Article.objects.prefetch_related("hashtag").filter(q)
+
+        return filtered_queryset
+
