@@ -30,7 +30,7 @@ urlpatterns = [
     path(
         "<int:article_id>/share/",
         ArticleShareAPIView.as_view(),
-        name="article-like",
+        name="article-share",
     ),
 ]
 
