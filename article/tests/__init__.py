@@ -1,0 +1,2 @@
+from .test_article_like import ArticleLikeAPITestCase
+from .test_article_share import ArticleShareAPITestCase
