@@ -1,5 +1,8 @@
+from django.db.models import Count, Q, Sum
+
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -15,6 +18,7 @@ class StatisticsAPIView(APIView):
     클라이언트는 해시태그, 조회 유형(type), 기간(start, end), 통계 값(value)을 지정할 수 있습니다.
     """
     serializer_class = ArticleStatisticsSerializer
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_summary="Article 통계 정보 조회 API",
@@ -36,7 +40,7 @@ class StatisticsAPIView(APIView):
 
         클라이언트가 제공한 쿼리 파라미터를 기반으로 통계 정보를 조회하고 반환합니다.
         """
-        serializer = self.serializer_class(data=request.GET)
+        serializer = self.serializer_class(data=request.GET, context={'request': request})
         if serializer.is_valid():
             try:
                 hashtag = serializer.validated_data['hashtag']
