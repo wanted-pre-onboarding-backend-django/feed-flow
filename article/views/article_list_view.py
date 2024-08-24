@@ -46,9 +46,6 @@ class ArticlesView(APIView):
                 tags = request.data["hashtag"]
                 # 사용자가 등록하려고한 태그 스트링 뭉치
                 for word in tags.split():
-                    print("<<<<<<")
-                    print(word)
-                    print("<<<<<<")
                     if word.startswith("#"):
                         hashtag_obj, created = Hashtag.objects.get_or_create(
                             name=word[1:]
