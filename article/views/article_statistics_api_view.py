@@ -46,6 +46,9 @@ class StatisticsAPIView(APIView):
                 end_date = serializer.validated_data['end']
 
                 queryset = self.get_filtered_queryset(start_date, end_date, hashtag)
+
+                statistics = self.get_statistics(queryset, value, aggregation_type)
+                serializer = StatisticsDateSerializer(statistics, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
             except Exception as e:
@@ -63,3 +66,37 @@ class StatisticsAPIView(APIView):
 
         return filtered_queryset
 
+    def get_statistics(self, queryset, value, aggregation_type):
+        """
+        주어진 queryset에 대해 시계열 통계 정보를 조회하고 반환합니다.
+
+        Args:
+            queryset: 데이터베이스에서 조회된 QuerySet입니다.
+            value: count, view_count, share_count, like_count 중 하나로, 조회할 값의 유형입니다.
+            aggregation_type: 날짜 또는 시간 단위로 데이터를 그룹화하기 위한 함수입니다 (예: TruncDay, TruncHour).
+
+        Returns:
+            List of dictionaries:
+                - datetime: 집계된 날짜 또는 시간입니다.
+                - count: 해당 datetime에서의 집계 결과입니다.
+
+        Raises:
+            ValueError: 지원하지 않는 value 값이 전달된 경우 발생합니다.
+        """
+
+        # aggregation_type을 사용하여 'created_at' 필드를 날짜 또는 시간 단위로 그룹화하고, 이를 'datetime' 필드로 추가합니다.
+        annotated_queryset = (
+            queryset
+            .annotate(datetime=aggregation_type("created_at"))
+            .values("datetime")
+        )
+
+        # value에 따른 집계 방법 선택: count인 경우 개수, view_count/like_count/share_count인 경우 합계를 계산
+        if value == "count":
+            statistics = annotated_queryset.annotate(count=Count("id"))
+        elif value in ["view_count", "like_count", "share_count"]:
+            statistics = annotated_queryset.annotate(count=Sum(value))
+        else:
+            raise ValueError(f"Unsupported value: {value}")
+
+        return statistics
