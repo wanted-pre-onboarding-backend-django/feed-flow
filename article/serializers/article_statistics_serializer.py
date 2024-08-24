@@ -11,6 +11,7 @@ class ArticleStatisticsSerializer(serializers.Serializer):
     Serializer definition for ArticleStatisticsSerializer.
     : StatisticsAPIView에서 입력받은 쿼리 파라미터를 검증하기 위해 사용됩니다.
     """
+
     hashtag = serializers.CharField(
         required=False,
         allow_blank=True,
@@ -52,9 +53,9 @@ class ArticleStatisticsSerializer(serializers.Serializer):
         """
         type 필드의 유효성을 검사하고, 해당하는 Trunc 함수를 반환합니다.
         """
-        if value == 'date':
+        if value == "date":
             return TruncDay
-        elif value == 'hour':
+        elif value == "hour":
             return TruncHour
         else:
             raise serializers.ValidationError("Unsupported date_type")
@@ -70,11 +71,13 @@ class ArticleStatisticsSerializer(serializers.Serializer):
             data["hashtag"] = request.user.account
 
         # start_date와 end_date의 일관성 검사
-        start_date = data.get('start')
-        end_date = data.get('end')
+        start_date = data.get("start")
+        end_date = data.get("end")
 
         if start_date and end_date and start_date >= end_date:
-            raise serializers.ValidationError("The start date must be before the end date.")
+            raise serializers.ValidationError(
+                "The start date must be before the end date."
+            )
 
         return data
 
@@ -84,5 +87,6 @@ class StatisticsDateSerializer(serializers.Serializer):
     Serializer definition for StatisticsDateSerializer.
     : 날짜와 시간 단위의 통계 데이터를 직렬화하는데 사용됩니다.
     """
+
     datetime = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
     count = serializers.IntegerField()

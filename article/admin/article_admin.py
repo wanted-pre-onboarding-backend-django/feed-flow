@@ -10,6 +10,9 @@ class ArticleAdmin(admin.ModelAdmin):
         "type",
         "content_id",
         "user",
+        "view_cnt",
+        "like_cnt",
+        "share_cnt",
         "created_at",
     )
 

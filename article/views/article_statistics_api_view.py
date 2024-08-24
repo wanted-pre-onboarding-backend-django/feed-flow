@@ -17,6 +17,7 @@ class StatisticsAPIView(APIView):
     이 API는 특정 해시태그와 기간에 따른 게시물 통계를 조회합니다.
     클라이언트는 해시태그, 조회 유형(type), 기간(start, end), 통계 값(value)을 지정할 수 있습니다.
     """
+
     serializer_class = ArticleStatisticsSerializer
     permission_classes = [IsAuthenticated]
 
@@ -40,14 +41,16 @@ class StatisticsAPIView(APIView):
 
         클라이언트가 제공한 쿼리 파라미터를 기반으로 통계 정보를 조회하고 반환합니다.
         """
-        serializer = self.serializer_class(data=request.GET, context={'request': request})
+        serializer = self.serializer_class(
+            data=request.GET, context={"request": request}
+        )
         if serializer.is_valid():
             try:
-                hashtag = serializer.validated_data['hashtag']
-                value = serializer.validated_data['value']
-                aggregation_type = serializer.validated_data['type']
-                start_date = serializer.validated_data['start']
-                end_date = serializer.validated_data['end']
+                hashtag = serializer.validated_data["hashtag"]
+                value = serializer.validated_data["value"]
+                aggregation_type = serializer.validated_data["type"]
+                start_date = serializer.validated_data["start"]
+                end_date = serializer.validated_data["end"]
 
                 queryset = self.get_filtered_queryset(start_date, end_date, hashtag)
 
@@ -57,7 +60,10 @@ class StatisticsAPIView(APIView):
 
             except Exception as e:
                 print("An error occurred:", str(e))
-                return Response({"detail": "An error occurred while processing your request."}, status=500)
+                return Response(
+                    {"detail": "An error occurred while processing your request."},
+                    status=500,
+                )
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -89,11 +95,9 @@ class StatisticsAPIView(APIView):
         """
 
         # aggregation_type을 사용하여 'created_at' 필드를 날짜 또는 시간 단위로 그룹화하고, 이를 'datetime' 필드로 추가합니다.
-        annotated_queryset = (
-            queryset
-            .annotate(datetime=aggregation_type("created_at"))
-            .values("datetime")
-        )
+        annotated_queryset = queryset.annotate(
+            datetime=aggregation_type("created_at")
+        ).values("datetime")
 
         # value에 따른 집계 방법 선택: count인 경우 개수, view_count/like_count/share_count인 경우 합계를 계산
         if value == "count":
