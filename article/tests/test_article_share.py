@@ -14,14 +14,14 @@ class ArticleShareAPITestCase(APITestCase):
 
         # 테스트 유저 생성
         self.user = User.objects.create_user(
-            username="testuser",
+            account="testuser",
             password="test1234!",
             email="testuser@example.com",
         )
 
         # 로그인
         self.client.login(
-            username="testuser",
+            account="testuser",
             password="test1234!",
         )
 
