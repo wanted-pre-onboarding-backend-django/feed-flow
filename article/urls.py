@@ -7,6 +7,7 @@ from article.views import (
     ArticlesView,
     ArticleDetailView,
 )
+from article.views.article_statistics_api_view import StatisticsAPIView
 
 app_name = "article"
 router = DefaultRouter()
@@ -32,6 +33,7 @@ urlpatterns = [
         ArticleShareAPIView.as_view(),
         name="article-share",
     ),
+    path("statistics", StatisticsAPIView.as_view()),
 ]
 
 urlpatterns += router.urls
