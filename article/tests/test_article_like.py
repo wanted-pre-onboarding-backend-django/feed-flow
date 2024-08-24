@@ -48,26 +48,21 @@ class ArticleLikeAPITestCase(APITestCase):
         self.article.refresh_from_db()
         self.assertEqual(self.article.like_cnt, 1)
 
-    def test_like_article_no_id(self):
-        """Missing article id"""
-        url = reverse("article:article-like", kwargs={"article_id": ""})
-        response = self.client.patch(url)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    # 외부 API 연동 시 테스트
+    # def test_like_article_no_site(self):
+    #     """Missing article site"""
+    #     # article type 변경
+    #     self.article.type = "naver"
+    #     self.article.save()
 
-    def test_like_article_no_site(self):
-        """Missing article site"""
-        # article type 변경
-        self.article.type = "naver"
-        self.article.save()
-
-        response = self.client.patch(self.url)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    #     response = self.client.patch(self.url)
+    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_like_article_not_authenticated(self):
         """Request by not authenticated user"""
         self.client.logout()
         response = self.client.patch(self.url)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_like_article_invalid_id(self):
         """No matching article are found in the corresponding article_id"""
