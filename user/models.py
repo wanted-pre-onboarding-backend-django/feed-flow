@@ -1,8 +1,8 @@
 from django.db import models
-from config.models import BaseModel
+from django.contrib.auth.models import AbstractUser
 
 
-class User(BaseModel):
+class User(AbstractUser):
     """User Model Definition"""
 
     account = models.CharField(
