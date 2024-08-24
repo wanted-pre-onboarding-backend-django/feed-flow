@@ -1,2 +1,4 @@
 from .aricle_detail_serializer import ArticleDetailSerializer
 from .article_list_serializer import ArticleListSerializer
+from .article_statistics_serializer import ArticleStatisticsSerializer
+from .article_statistics_serializer import StatisticsDateSerializer
