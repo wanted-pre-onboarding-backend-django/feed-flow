@@ -1,36 +1,28 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
 from user.models import User
 
 
 @admin.register(User)
-class CustomUserAdmin(UserAdmin):
-    pass
-    fieldsets = (
-        (
-            "Profile",
-            {
-                "fields": (
-                    "account",
-                    "email",
-                    "password",
-                    "auth_code",
-                    "is_activated",
-                ),
-                "classes": ("wide",),
-            },
-        ),
-        (
-            "Important Dates",
-            {
-                "fields": ("last_login", "date_joined"),
-                "classes": ("collapse",),
-            },
-        ),
+class UserAdmin(admin.ModelAdmin):
+    """Admin View for User"""
+
+    list_display = (
+        "account",
+        "email",
+        "auth_code",
+        "is_active",
+        "created_at",
+        "updated_at",
     )
-
-    list_display = ("pk", "account", "email", "is_activated")
-
-    ordering = ()
-    filter_horizontal = ()
-    list_filter = ()
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+    )
+    search_fields = (
+        "account",
+        "email",
+    )
+    ordering = (
+        "created_at",
+        "updated_at",
+    )
