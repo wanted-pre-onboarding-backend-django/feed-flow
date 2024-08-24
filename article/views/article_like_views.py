@@ -1,3 +1,4 @@
+import requests
 from django.http import Http404
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -7,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 
 from article.models import Article
+from article.utils.article_site_dict import article_site_dict
 
 
 class ArticleLikeAPIView(APIView):
@@ -37,6 +39,25 @@ class ArticleLikeAPIView(APIView):
                     {"msg": "해당하는 게시글이 없습니다."},
                     status=status.HTTP_404_NOT_FOUND,
                 )
+
+            # 외부 api 요청용 url 제작
+            # 현재는 주석 처리
+            # url = ""
+            # if article.type in article_site_dict:
+            #     url = article_site_dict[article.type] + f"/like/{article.content_id}"
+            # else:
+            #     return Response(
+            #         {"msg": "존재하지 않는 사이트입니다."},
+            #         status=status.HTTP_400_BAD_REQUEST,
+            #     )
+
+            # 외부 api 호출
+            # response = requests.post(url)
+            # if response.status_code != 200:
+            #     return Response(
+            #         {"msg": "해당 사이트의 좋아요 작업에 실패했습니다."},
+            #         status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            #     )
 
             # like_cnt 증가
             article.like_cnt += 1
