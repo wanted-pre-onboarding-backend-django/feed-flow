@@ -12,7 +12,7 @@ from article.utils.article_site_dict import article_site_dict
 
 
 class ArticleShareAPIView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         """
