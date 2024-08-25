@@ -31,6 +31,7 @@ db_port = "postgres"
 if ENV == "local":
     db_port = "localhost"
 
+print(db_port)
 # 환경 변수 파일 읽기
 env = environ.Env()
 env.read_env("{BASE_DIR}/.env.")
@@ -40,7 +41,7 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 # Application definition
 
@@ -112,10 +113,10 @@ DATABASES = {
     #     },
     # }
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": env("POSTGRES_DB"),
-        "USER": env("POSTGRES_USER"),
-        "PASSWORD": env("POSTGRES_PASSWORD"),
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env("POSTGRES_DB", default="feedflowdb"),
+        "USER": env("POSTGRES_USER", default="postgres"),
+        "PASSWORD": env("POSTGRES_PASSWORD", default="password"),
         # TODO: Docker 환경에서는 세팅해둔 db 설정 사용하도록 변경 env('POSTGRESQL_HOST')
         # 'HOST': env('POSTGRESQL_HOST'),
         "HOST": db_port,
@@ -162,9 +163,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = "/staticfiles/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_URL = "/static/"
 
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"
 
 
 # Default primary key field type
