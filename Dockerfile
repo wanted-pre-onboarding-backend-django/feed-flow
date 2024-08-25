@@ -11,6 +11,9 @@ LABEL description="Feedflow's Django Server"
 # 후속 명령들은 해당 디렉터리에서 실행
 WORKDIR /app
 
+# pip 최신 버전으로 업데이트
+RUN pip install --upgrade pip
+
 # 필요한 패키지 설치
 # Pipfile과 Pipfile.lock을 /app 디렉터리로 복사
 COPY Pipfile Pipfile.lock /app/
@@ -18,7 +21,7 @@ COPY Pipfile Pipfile.lock /app/
 # pipenv 설치 뒤, Pipfile.lock에 명시된 패키지 설치
 # --deploy: 패키지를 잠금 파일에서만 설치하게 함
 # --ignore-pipfile: Pipfile을 무시하고 Pipfile.lock만 참조
-RUN pip install pipenv && pipenv install --deploy --ignore-pipfile
+RUN pip install pipenv && pipenv --python /usr/local/bin/python3.10 install --deploy --ignore-pipfile
 
 # 프로젝트 소스 복사
 # 현재 로컬 디렉터리의 모든 파일을 컨테이너의 /app 디렉터리로 복사
