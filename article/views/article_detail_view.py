@@ -1,15 +1,9 @@
 from rest_framework.views import APIView
-from django.db import transaction
-from rest_framework.status import HTTP_204_NO_CONTENT
+from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.exceptions import (
-    NotFound,
-    NotAuthenticated,
-    ParseError,
-    PermissionDenied,
-)
 from article.models import Article, Hashtag
 from article.serializers import ArticleDetailSerializer
+from django.shortcuts import get_object_or_404
 
 
 class ArticleDetailView(APIView):
@@ -20,15 +14,15 @@ class ArticleDetailView(APIView):
         try:
             return Article.objects.get(pk=pk)
         except Article.DoesNotExist:
-            raise NotFound
+            return get_object_or_404(Article, pk=pk)
 
     def get(self, request, pk):
         # 게시물 아이디값에 따라 게시물을 찾아 보낸다
         Article = self.get_object(pk)
-        # 글 조회수 증가 쿠키값으로 하루에 한카운트 증가
+        # API 호출 시, 해당 게시물 view_count 가 1 증가합니다.
         cookie_name = f"hit_{pk}"
         serializer = ArticleDetailSerializer(Article)
-        response = Response(serializer.data)
+        response = Response(serializer.data, status=status.HTTP_200_OK)
         if cookie_name not in request.COOKIES:
             Article.view_cnt += 1
             Article.save()
@@ -41,10 +35,10 @@ class ArticleDetailView(APIView):
         Article = self.get_object(pk)
         if not request.user.is_authenticated:
             # 유저가 로그인을 하지 않았을시
-            raise NotAuthenticated
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         if Article.user != request.user:
             # 글쓴이가 아닐시
-            raise PermissionDenied
+            return Response(status=status.HTTP_403_FORBIDDEN)
         serializer = ArticleDetailSerializer(
             Article,
             data=request.data,
@@ -52,7 +46,7 @@ class ArticleDetailView(APIView):
         )
         if serializer.is_valid():
             article = serializer.save(user=request.user)
-            tags = request.data["hashtag"]
+            tags = request.data.get("hashtag", "")
             # 사용자가 등록하려고한 뭉치
             for word in tags.split():
                 if word.startswith("#"):
@@ -60,17 +54,17 @@ class ArticleDetailView(APIView):
                     # 각 단어가 해쉬태그엔티티에 존재하면 그 객체를 보내주고 아니면 생성
                     article.hashtag.add(hashtag_obj.pk)
             serializer = ArticleDetailSerializer(article)
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
         Article = self.get_object(pk)
         if not request.user.is_authenticated:
             # 유저가 로그인 안되어있을시
-            raise NotAuthenticated
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         if Article.user != request.user:
             # 해당 게시글 글쓴이 아닐시
-            raise PermissionDenied
+            return Response(status=status.HTTP_403_FORBIDDEN)
         Article.delete()
-        return Response(status=HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)
