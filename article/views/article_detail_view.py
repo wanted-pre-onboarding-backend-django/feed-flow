@@ -25,8 +25,16 @@ class ArticleDetailView(APIView):
     def get(self, request, pk):
         # 게시물 아이디값에 따라 게시물을 찾아 보낸다
         Article = self.get_object(pk)
+        # 글 조회수 증가 쿠키값으로 하루에 한카운트 증가
+        cookie_name = f"hit_{pk}"
         serializer = ArticleDetailSerializer(Article)
-        return Response(serializer.data)
+        response = Response(serializer.data)
+        if cookie_name not in request.COOKIES:
+            Article.view_cnt += 1
+            Article.save()
+            response.set_cookie(cookie_name, "true", max_age=86400)
+            # 서버 시갓 24시간 후 만료 쿠키
+        return response
 
     def put(self, request, pk):
         # 게시물의 수정하는 경우
