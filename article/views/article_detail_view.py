@@ -25,7 +25,7 @@ class ArticleDetailView(APIView):
     def get(self, request, pk):
         # 게시물 아이디값에 따라 게시물을 찾아 보낸다
         Article = self.get_object(pk)
-        # 글 조회수 증가 쿠키값으로 하루에 한카운트 증가
+        # API 호출 시, 해당 게시물 view_count 가 1 증가합니다.
         cookie_name = f"hit_{pk}"
         serializer = ArticleDetailSerializer(Article)
         response = Response(serializer.data)

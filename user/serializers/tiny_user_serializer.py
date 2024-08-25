@@ -5,4 +5,4 @@ from user.models import User
 class TinyUserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ("account",)
+        fields = ["account"]

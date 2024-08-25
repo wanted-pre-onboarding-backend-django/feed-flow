@@ -18,12 +18,13 @@ class ArticlesView(APIView):
     def get(self, request):
         filtered = Article.objects.all()
         query_params = request.query_params
-
+        # 정확히 일치하는 해쉬태그만 검색
         if "hashtag" in query_params:
             filtered = filtered.filter(hashtag__name__exact=query_params["hashtag"])
         else:
             if request.user.is_authenticated:
                 filtered = filtered.filter(hashtag__name__exact=request.user.account)
+                # 해쉬태그 없을시 로그인상태면 유저의 계정명으로 검색
         if "type" in query_params:
             filtered = filtered.filter(type__exact=query_params["type"])
 
@@ -42,6 +43,7 @@ class ArticlesView(APIView):
                     content__icontains=query_params["search"]
                 )
                 filtered = search_result.union(cotent_result)
+        # 순서는 기본 생성일 기준
         order_filed = query_params.get("order_by", "created_at")
         valid_order_by = [
             "created_at",
@@ -57,9 +59,9 @@ class ArticlesView(APIView):
         ]
         if order_filed in valid_order_by:
             filtered = filtered.order_by(order_filed)
-
+        # 패이징
         page = int(query_params.get("page", 1))
-        page_count = int(query_params.get("page_count", 3))
+        page_count = int(query_params.get("page_count", 10))
         start = (page - 1) * page_count
         end = start + page_count
 
@@ -79,7 +81,7 @@ class ArticlesView(APIView):
                 article = serializer.save(user=request.user)
                 # 작성자가 누구인지 같이 저장한다
                 tags = request.data["hashtag"]
-                # 사용자가 등록하려고한 태그 스트링 뭉치
+                # 사용자가 등록하려고한 태그 스트링 뭉치 예시) "#맛집 #서울 #주차"
                 for word in tags.split():
                     if word.startswith("#"):
                         hashtag_obj, created = Hashtag.objects.get_or_create(
