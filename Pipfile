@@ -12,6 +12,7 @@ requests = "*"
 uvicorn = "*"
 gunicorn = "*"
 psycopg2-binary = "*"
+whitenoise = "*"
 
 [dev-packages]
 flake8 = "==7.1.0"

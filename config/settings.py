@@ -31,7 +31,6 @@ db_port = "postgres"
 if ENV == "local":
     db_port = "localhost"
 
-print(db_port)
 # 환경 변수 파일 읽기
 env = environ.Env()
 env.read_env("{BASE_DIR}/.env.")
@@ -72,6 +71,7 @@ INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + PACKAGE_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -169,6 +169,11 @@ STATIC_URL = "/static/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
+# WHITENOISE Setting
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_MANIFEST_STRICT = False
+WHITENOISE_ALLOW_ALL_ORIGINS = True
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
