@@ -1,9 +1,6 @@
 from rest_framework.views import APIView
-from rest_framework.status import HTTP_204_NO_CONTENT
+from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.exceptions import (
-    NotAuthenticated,
-)
 from article.models import Hashtag, Article
 from article.serializers import ArticleDetailSerializer, ArticleListSerializer
 
@@ -68,7 +65,7 @@ class ArticlesView(APIView):
             many=True,
         )
 
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         if request.user.is_authenticated:
@@ -88,8 +85,8 @@ class ArticlesView(APIView):
                         # 각 단어가 해쉬태그엔티티에 존재하면 그 객체를 보내주고 아니면 생성
                         article.hashtag.add(hashtag_obj.pk)
                 serializer = ArticleDetailSerializer(article)
-                return Response(serializer.data)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
-                return Response(serializer.errors)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            raise NotAuthenticated
+            raise Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
