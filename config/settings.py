@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 import environ
 from pathlib import Path
 
@@ -21,8 +22,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+
+# ENV 변수 읽기
+ENV = os.environ.get("ENV", "local")
+
+# 환경 변수에 따른 db port 변경
+db_port = "postgres"
+if ENV == "local":
+    db_port = "localhost"
+
+# 환경 변수 파일 읽기
 env = environ.Env()
-env.read_env(f"{BASE_DIR}/.env")
+env.read_env("{BASE_DIR}/.env.")
 
 SECRET_KEY = env("SECRET_KEY")
 
@@ -30,7 +41,6 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -94,11 +104,24 @@ WSGI_APPLICATION = "config.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
+    # "default": {
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": BASE_DIR / "db.sqlite3",
+    #     "TEST": {
+    #         "NAME": "mytestdatabase",
+    #     },
+    # }
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": env("POSTGRES_DB"),
+        "USER": env("POSTGRES_USER"),
+        "PASSWORD": env("POSTGRES_PASSWORD"),
+        # TODO: Docker 환경에서는 세팅해둔 db 설정 사용하도록 변경 env('POSTGRESQL_HOST')
+        # 'HOST': env('POSTGRESQL_HOST'),
+        "HOST": db_port,
+        "PORT": "5432",
         "TEST": {
-            "NAME": "mytestdatabase",
+            "NAME": "mytestdb",
         },
     }
 }
@@ -139,7 +162,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/staticfiles/"
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
