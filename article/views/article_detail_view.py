@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from article.models import Article, Hashtag
 from article.serializers import ArticleDetailSerializer
+from django.shortcuts import get_object_or_404
 
 
 class ArticleDetailView(APIView):
@@ -13,7 +14,7 @@ class ArticleDetailView(APIView):
         try:
             return Article.objects.get(pk=pk)
         except Article.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return get_object_or_404(Article, pk=pk)
 
     def get(self, request, pk):
         # 게시물 아이디값에 따라 게시물을 찾아 보낸다
@@ -45,7 +46,7 @@ class ArticleDetailView(APIView):
         )
         if serializer.is_valid():
             article = serializer.save(user=request.user)
-            tags = request.data["hashtag"]
+            tags = request.data.get("hashtag", "")
             # 사용자가 등록하려고한 뭉치
             for word in tags.split():
                 if word.startswith("#"):

@@ -75,7 +75,7 @@ class ArticlesView(APIView):
                 # 모델에 유효한 값인지
                 article = serializer.save(user=request.user)
                 # 작성자가 누구인지 같이 저장한다
-                tags = request.data["hashtag"]
+                tags = request.data.get("hashtag", "")
                 # 사용자가 등록하려고한 태그 스트링 뭉치 예시) "#맛집 #서울 #주차"
                 for word in tags.split():
                     if word.startswith("#"):
@@ -89,4 +89,4 @@ class ArticlesView(APIView):
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            raise Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
