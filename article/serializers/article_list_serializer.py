@@ -15,7 +15,20 @@ class ArticleListSerializer(ModelSerializer):
 
     class Meta:
         model = Article
-        fields = "__all__"
+        fields = [
+            "id",
+            "type",
+            "content_id",
+            "title",
+            "content",
+            "view_cnt",
+            "view_cnt",
+            "share_cnt",
+            "user",
+            "hashtag",
+            "created_at",
+            "updated_at",
+        ]
 
     # 필드 커스텀을 위한 함수 to_representation함수(장고함수)
     def to_representation(self, instance):

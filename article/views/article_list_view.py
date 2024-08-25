@@ -17,7 +17,6 @@ class ArticlesView(APIView):
 
     def get(self, request):
         filtered = Article.objects.all()
-        print(filtered)
         query_params = request.query_params
 
         if "hashtag" in query_params:
