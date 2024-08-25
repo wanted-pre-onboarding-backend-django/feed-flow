@@ -1,0 +1,49 @@
+version: "3.9"
+
+volumes:
+  postgres: {}
+
+services:
+  postgres:
+    image: postgres:16.0-alpine
+    volumes:
+      - postgres:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: feedflowdb
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      TZ: Asia/Seoul
+    env_file:
+      - .env
+    restart: on-failure
+
+  django:
+    container_name: django
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      bash -c "pipenv run python manage.py migrate &&
+      pipenv run gunicorn --config /app/config/gunicorn_config.py config.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    environment:
+      POSTGRESQL_HOST: postgres
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    restart: on-failure
+
+  # nginx 차후 적용
+  # nginx:
+  #   image: nginx:latest
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./config/nginx.conf:/etc/nginx/nginx.conf
+  #     - .:/app
+  #   depends_on:
+  #     - django
