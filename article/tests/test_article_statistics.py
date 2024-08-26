@@ -274,3 +274,117 @@ class StatisticsAPITestCase(BaseStatisticsAPITestCase):
             else:
                 self.fail(f"예상치 않은 시간 {datetime_str}가 응답에 포함되었습니다.")
 
+    def test_statistics_by_view_count(self):
+        """`value`가 'view_count'일 때 통계 조회가 올바르게 수행되는지 테스트"""
+        self.client.force_login(self.user)
+
+        # `value`를 'view_count'로 설정하여 조회 요청
+        response = self.client.get(
+            self.url,
+            {
+                "type": "date",
+                "start": (self.now - timedelta(days=7)).strftime("%Y-%m-%d"),
+                "end": self.now.strftime("%Y-%m-%d"),
+                "value": "view_count",
+                "hashtag": "testtag1",
+            },
+        )
+
+        # 상태 코드가 500일 경우, 응답 내용 출력
+        if response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR:
+            print("서버 오류 발생:", response.content)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # 예상되는 view_count 값
+        expected_view_counts = {
+            (self.article2.created_at).strftime("%Y-%m-%d"): self.article2.view_cnt,
+            (self.article3.created_at).strftime("%Y-%m-%d"): self.article3.view_cnt,
+        }
+
+        # 응답 데이터에 통계가 올바르게 포함되어 있는지 확인
+        for item in response.data:
+            datetime_str = item["datetime"]
+            date_str = datetime_str.split(" ")[0]
+
+            if date_str in expected_view_counts:
+                self.assertEqual(
+                    item["count"],
+                    expected_view_counts[date_str],
+                    f"{date_str}에 대한 view_count 값이 예상과 다릅니다.",
+                )
+            else:
+                self.fail(f"예상치 않은 날짜 {date_str}가 응답에 포함되었습니다.")
+
+    def test_statistics_by_like_count(self):
+        """`value`가 'like_count'일 때 통계 조회가 올바르게 수행되는지 테스트"""
+        self.client.force_login(self.user)
+
+        # `value`를 'like_count'로 설정하여 조회 요청
+        response = self.client.get(
+            self.url,
+            {
+                "type": "date",
+                "start": (self.now - timedelta(days=7)).strftime("%Y-%m-%d"),
+                "end": self.now.strftime("%Y-%m-%d"),
+                "value": "like_count",
+                "hashtag": "testtag1",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # 예상되는 like_count 값
+        expected_like_counts = {
+            (self.article2.created_at).strftime("%Y-%m-%d"): self.article2.like_cnt,
+            (self.article3.created_at).strftime("%Y-%m-%d"): self.article3.like_cnt,
+        }
+
+        # 응답 데이터에 통계가 올바르게 포함되어 있는지 확인
+        for item in response.data:
+            datetime_str = item["datetime"]
+            date_str = datetime_str.split(" ")[0]
+
+            if date_str in expected_like_counts:
+                self.assertEqual(
+                    item["count"],
+                    expected_like_counts[date_str],
+                    f"{date_str}에 대한 like_count 값이 예상과 다릅니다.",
+                )
+            else:
+                self.fail(f"예상치 않은 날짜 {date_str}가 응답에 포함되었습니다.")
+
+    def test_statistics_by_share_count(self):
+        """`value`가 'share_count'일 때 통계 조회가 올바르게 수행되는지 테스트"""
+        self.client.force_login(self.user)
+
+        # `value`를 'share_count'로 설정하여 조회 요청
+        response = self.client.get(
+            self.url,
+            {
+                "type": "date",
+                "start": (self.now - timedelta(days=7)).strftime("%Y-%m-%d"),
+                "end": self.now.strftime("%Y-%m-%d"),
+                "value": "share_count",
+                "hashtag": "testtag1",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # 예상되는 share_count 값
+        expected_share_counts = {
+            (self.article2.created_at).strftime("%Y-%m-%d"): self.article2.share_cnt,
+            (self.article3.created_at).strftime("%Y-%m-%d"): self.article3.share_cnt,
+        }
+
+        # 응답 데이터에 통계가 올바르게 포함되어 있는지 확인
+        for item in response.data:
+            datetime_str = item["datetime"]
+            date_str = datetime_str.split(" ")[0]
+
+            if date_str in expected_share_counts:
+                self.assertEqual(
+                    item["count"],
+                    expected_share_counts[date_str],
+                    f"{date_str}에 대한 share_count 값이 예상과 다릅니다.",
+                )
+            else:
+                self.fail(f"예상치 않은 날짜 {date_str}가 응답에 포함되었습니다.")
