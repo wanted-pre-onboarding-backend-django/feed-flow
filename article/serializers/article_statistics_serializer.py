@@ -60,6 +60,17 @@ class ArticleStatisticsSerializer(serializers.Serializer):
         else:
             raise serializers.ValidationError("Unsupported date_type")
 
+    def validate_value(self, value):
+        """
+        `value` 필드를 모델 필드와 매핑하도록 변경.
+        """
+        value_mapping = {
+            "view_count": "view_cnt",
+            "like_count": "like_cnt",
+            "share_count": "share_cnt",
+        }
+        return value_mapping.get(value, value)
+
     def validate(self, data):
         """
         해시태그가 입력되지 않은 경우 사용자 계정명을 해시태그로 설정합니다.

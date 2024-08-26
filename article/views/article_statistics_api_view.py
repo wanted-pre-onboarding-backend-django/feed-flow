@@ -102,7 +102,7 @@ class StatisticsAPIView(APIView):
         # value에 따른 집계 방법 선택: count인 경우 개수, view_count/like_count/share_count인 경우 합계를 계산
         if value == "count":
             statistics = annotated_queryset.annotate(count=Count("id"))
-        elif value in ["view_count", "like_count", "share_count"]:
+        elif value in ["view_cnt", "like_cnt", "share_cnt"]:
             statistics = annotated_queryset.annotate(count=Sum(value))
         else:
             raise ValueError(f"Unsupported value: {value}")
