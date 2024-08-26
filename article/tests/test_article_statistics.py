@@ -236,3 +236,41 @@ class StatisticsAPITestCase(BaseStatisticsAPITestCase):
             else:
                 self.fail(f"예상치 않은 날짜 {date_str}가 응답에 포함되었습니다.")
 
+    def test_statistics_by_hour(self):
+        """`type`이 'hour'일 때 시간별 통계 조회가 올바르게 수행되는지 테스트"""
+        self.client.force_login(self.user)
+
+        # `type`을 'hour'로 설정하여 조회 요청
+        response = self.client.get(
+            self.url,
+            {
+                "type": "hour",
+                "start": (self.now - timedelta(days=2)).strftime("%Y-%m-%d"),
+                "end": self.now.strftime("%Y-%m-%d"),
+                "hashtag": "testtag1",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # 예상되는 count 값 (UTC가 아닌 서울 시간대 기준)
+        expected_counts = {
+            (
+                self.article2.created_at.astimezone(timezone.get_current_timezone())
+            ).strftime("%Y-%m-%d %H:00"): 1,
+        }
+
+        # 응답 데이터에 시간별 통계가 올바르게 포함되어 있는지 확인
+        for item in response.data:
+            # 응답 데이터의 날짜 및 시간 부분 추출
+            datetime_str = item["datetime"]
+
+            # 예상된 시간의 count 값과 비교
+            if datetime_str in expected_counts:
+                self.assertEqual(
+                    item["count"],
+                    expected_counts[datetime_str],
+                    f"{datetime_str}에 대한 count 값이 예상과 다릅니다.",
+                )
+            else:
+                self.fail(f"예상치 않은 시간 {datetime_str}가 응답에 포함되었습니다.")
+
