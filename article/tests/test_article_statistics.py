@@ -114,3 +114,35 @@ class StatisticsAPITestCase(BaseStatisticsAPITestCase):
             self.assertGreaterEqual(datetime_obj_date, start_default)
             self.assertLessEqual(datetime_obj_date, end_default)
 
+    def test_statistics_with_specific_hashtag(self):
+        """특정 해시태그로 통계 조회가 올바르게 수행되는지 테스트"""
+        self.client.force_login(self.user)
+
+        # 특정 해시태그로 조회 요청
+        response = self.client.get(self.url, {"type": "date", "hashtag": "testtag1"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # 응답 데이터가 비어있지 않은지 확인
+        self.assertTrue(len(response.data) > 0, "응답 데이터가 비어 있습니다.")
+
+        expected_counts = {
+            "2024-08-21": 1,
+            "2024-08-24": 1,
+        }
+
+        # 응답 데이터에 특정 해시태그와 관련된 게시물의 통계가 포함되어 있는지 확인
+        for item in response.data:
+            # 응답 데이터의 날짜 부분만 추출
+            datetime_str = item["datetime"]
+            date_str = datetime_str.split(" ")[0]  # 날짜 부분만 사용
+
+            # 예상된 날짜의 count 값과 비교
+            if date_str in expected_counts:
+                self.assertEqual(
+                    item["count"],
+                    expected_counts[date_str],
+                    f"{date_str}에 대한 count 값이 예상과 다릅니다.",
+                )
+            else:
+                self.fail(f"예상치 않은 날짜 {date_str}가 응답에 포함되었습니다.")
+
