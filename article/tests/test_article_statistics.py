@@ -1,0 +1,78 @@
+from rest_framework.test import APITestCase
+from rest_framework import status
+from django.urls import reverse
+from django.contrib.auth import get_user_model
+
+from datetime import datetime, timedelta
+from django.utils import timezone
+
+from article.models import Hashtag, Article
+
+
+class BaseStatisticsAPITestCase(APITestCase):
+    def setUp(self):
+        self.now = timezone.now()
+        # 커스텀 User 모델 가져오기
+        User = get_user_model()
+
+        # 테스트 유저 생성
+        self.user = User.objects.create_user(
+            account="testuser",
+            password="test1234!",
+            email="testuser@example.com",
+        )
+
+        # 테스트 해시태그 생성
+        self.hashtag1 = Hashtag.objects.create(name="testuser")
+        self.hashtag2 = Hashtag.objects.create(name="testtag1")
+        self.hashtag3 = Hashtag.objects.create(name="testtag2")
+
+        # 테스트 Article 데이터 생성
+        self.article1 = Article.objects.create(
+            type="instagram",
+            content_id="12345",
+            title="Test Article 1",
+            content="This is a test article 1",
+            view_cnt=100,
+            like_cnt=50,
+            share_cnt=10,
+            # created_at=self.now - timedelta(days=1),  # 1일 전
+            user=self.user,
+        )
+        self.article1.hashtag.add(self.hashtag1)
+        self.article1.created_at = self.now - timedelta(days=1)
+        self.article1.save()
+
+        self.article2 = Article.objects.create(
+            type="facebook",
+            content_id="12346",
+            title="Test Article 2",
+            content="This is a test article 2",
+            view_cnt=200,
+            like_cnt=150,
+            share_cnt=20,
+            # created_at=self.now - timedelta(days=2),  # 2일 전
+            user=self.user,
+        )
+        self.article2.hashtag.add(self.hashtag1, self.hashtag2)
+        self.article2.created_at = self.now - timedelta(days=2)
+        self.article2.save()
+
+        self.article3 = Article.objects.create(
+            type="twitter",
+            content_id="12347",
+            title="Test Article 3",
+            content="This is a test article 3",
+            view_cnt=300,
+            like_cnt=250,
+            share_cnt=30,
+            # created_at=self.now - timedelta(days=5),  # 5일 전
+            user=self.user,
+        )
+        self.article3.hashtag.add(self.hashtag2)
+        self.article3.created_at = self.now - timedelta(days=5)
+        self.article3.save()
+
+        # 통계 API URL 설정
+        self.url = reverse("article:statistics")
+
