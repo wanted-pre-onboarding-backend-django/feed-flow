@@ -191,3 +191,48 @@ class StatisticsAPITestCase(BaseStatisticsAPITestCase):
             else:
                 self.fail(f"예상치 않은 날짜 {date_str}가 응답에 포함되었습니다.")
 
+    def test_statistics_by_date(self):
+        """`type`이 'date'일 때 일별 통계 조회가 올바르게 수행되는지 테스트"""
+        self.client.force_login(self.user)
+
+        # `type`을 'date'로 설정하여 조회 요청
+        response = self.client.get(
+            self.url,
+            {
+                "type": "date",
+                "start": (self.now.date() - timedelta(days=5)).strftime("%Y-%m-%d"),
+                "end": self.now.date().strftime("%Y-%m-%d"),
+                "hashtag": "testtag1",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # 응답 데이터가 비어있지 않은지 확인
+        self.assertTrue(len(response.data) > 0, "응답 데이터가 비어 있습니다.")
+
+        # 예상되는 count 값
+        expected_counts = {
+            (self.now.date() - timedelta(days=5)).strftime(
+                "%Y-%m-%d"
+            ): 1,  # article3가 5일 전
+            (self.now.date() - timedelta(days=2)).strftime(
+                "%Y-%m-%d"
+            ): 1,  # article2가 2일 전
+        }
+
+        # 응답 데이터에 일별 통계가 올바르게 포함되어 있는지 확인
+        for item in response.data:
+            # 응답 데이터의 날짜 부분만 추출
+            datetime_str = item["datetime"]
+            date_str = datetime_str.split(" ")[0]  # 날짜 부분만 사용
+
+            # 예상된 날짜의 count 값과 비교
+            if date_str in expected_counts:
+                self.assertEqual(
+                    item["count"],
+                    expected_counts[date_str],
+                    f"{date_str}에 대한 count 값이 예상과 다릅니다.",
+                )
+            else:
+                self.fail(f"예상치 않은 날짜 {date_str}가 응답에 포함되었습니다.")
+
