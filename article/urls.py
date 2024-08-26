@@ -33,7 +33,11 @@ urlpatterns = [
         ArticleShareAPIView.as_view(),
         name="article-share",
     ),
-    path("statistics", StatisticsAPIView.as_view()),
+    path(
+        "statistics",
+        StatisticsAPIView.as_view(),
+        name="statistics",
+    ),
 ]
 
 urlpatterns += router.urls

@@ -2,3 +2,4 @@ from .test_article_like import ArticleLikeAPITestCase
 from .test_article_share import ArticleShareAPITestCase
 from .test_article_list import ArticleListAPITestCase
 from .test_article_detail import ArticleDetailAPITestCase
+from .test_article_statistics import StatisticsAPITestCase
