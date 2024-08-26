@@ -76,3 +76,16 @@ class BaseStatisticsAPITestCase(APITestCase):
         # 통계 API URL 설정
         self.url = reverse("article:statistics")
 
+
+class StatisticsAPITestCase(BaseStatisticsAPITestCase):
+    def test_access_without_authentication(self):
+        """인증되지 않은 사용자가 접근할 때 403 Forbidden이 반환되는지 테스트"""
+        response = self.client.get(self.url, {"type": "date"})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_access_with_authentication(self):
+        """인증된 사용자가 접근할 때 200 OK가 반환되는지 테스트"""
+        self.client.force_login(self.user)
+        response = self.client.get(self.url, {"type": "date"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
