@@ -20,14 +20,10 @@ class ArticleDetailView(APIView):
         # 게시물 아이디값에 따라 게시물을 찾아 보낸다
         Article = self.get_object(pk)
         # API 호출 시, 해당 게시물 view_count 가 1 증가합니다.
-        cookie_name = f"hit_{pk}"
         serializer = ArticleDetailSerializer(Article)
         response = Response(serializer.data, status=status.HTTP_200_OK)
-        if cookie_name not in request.COOKIES:
-            Article.view_cnt += 1
-            Article.save()
-            response.set_cookie(cookie_name, "true", max_age=86400)
-            # 서버 시갓 24시간 후 만료 쿠키
+        Article.view_cnt += 1
+        Article.save()
         return response
 
     def put(self, request, pk):

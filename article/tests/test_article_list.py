@@ -49,7 +49,7 @@ class ArticleListAPITestCase(APITestCase):
 
     def test_create_bad_article(self):
         # 로그인
-        self.client.login(self.user)
+        self.client.force_login(self.user)
 
         # 형식에 맞지않는 게시글 생성
         response = self.client.post(
