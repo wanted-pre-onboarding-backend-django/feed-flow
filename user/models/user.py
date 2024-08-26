@@ -61,7 +61,10 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         verbose_name="인증코드",
     )
     is_active = models.BooleanField(
-        default=True,  # Todo: 회원가입 인증 구현
+        default=True,
+        # 인증코드 승인하는 api 에서 비밀번호과 계정 맞고 그 유저의 인증코드가 일치할때를 찾아야하는데
+        # 초기에 false를 해두면 비밀번호계정이 옳아도 그 유저를 반환하지않아 그유저의 인증코트 확인이어렵다
+        # 따라서 is_approved를 추가하였다
         verbose_name="활성화 여부",
     )
     is_staff = models.BooleanField(
@@ -72,6 +75,7 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         default=False,
         verbose_name="슈퍼유저 여부",
     )
+    is_approved = models.BooleanField(default=False)  # 가입 승인을 위한 필드
 
     objects = CustomUserManager()
 

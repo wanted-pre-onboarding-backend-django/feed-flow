@@ -20,6 +20,12 @@ from django.urls import path, re_path, include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from user.views import (
+    UserSignupAPIView,
+    UserLogInAPIView,
+    UserLogOutAPIView,
+    UserSignupConfirmAPIView,
+)
 
 
 schema_view = get_schema_view(
@@ -60,4 +66,8 @@ urlpatterns = [
     ),
     path("users/", include("user.urls")),
     path("articles/", include("article.urls")),
+    path("signup/", UserSignupAPIView.as_view()),
+    path("signup-confirm", UserSignupConfirmAPIView.as_view()),
+    path("login", UserLogInAPIView.as_view()),
+    path("logout/", UserLogOutAPIView.as_view()),
 ]
