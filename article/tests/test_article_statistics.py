@@ -89,3 +89,28 @@ class StatisticsAPITestCase(BaseStatisticsAPITestCase):
         response = self.client.get(self.url, {"type": "date"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_default_parameters(self):
+        """기본값으로 통계 조회가 올바르게 수행되는지 테스트"""
+        self.client.force_login(self.user)
+
+        # required 파라미터만을 사용하여 GET 요청
+        response = self.client.get(self.url, {"type": "date"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # 기본값 확인: start는 7일 전, end는 today, type은 'date'
+        start_default = self.now.date() - timedelta(days=7)
+        end_default = self.now.date()
+
+        # 응답 데이터가 비어있지 않은지 확인
+        self.assertTrue(len(response.data) > 0, "응답 데이터가 비어 있습니다.")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        for item in response.data:
+            self.assertIn("count", item)
+            datetime_str = item["datetime"]
+            datetime_obj = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M")
+
+            datetime_obj_date = datetime_obj.date()
+            self.assertGreaterEqual(datetime_obj_date, start_default)
+            self.assertLessEqual(datetime_obj_date, end_default)
+
