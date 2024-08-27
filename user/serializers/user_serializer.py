@@ -11,7 +11,6 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "password",
             "auth_code",
-            "is_activated",
             "is_active",
             "is_staff",
             "is_superuser",
@@ -27,23 +26,3 @@ class UserSerializer(serializers.ModelSerializer):
             "created_at": {"read_only": True},
             "updated_at": {"read_only": True},
         }
-
-    def create(self, validated_data):
-        """새로운 유저를 생성할 때 비밀번호를 해시하여 저장"""
-        password = validated_data.pop("password", None)
-        instance = self.Meta.model(**validated_data)
-        if password is not None:
-            instance.set_password(password)  # 비밀번호를 해시하여 설정
-        instance.save()
-        return instance
-
-    def update(self, instance, validated_data):
-        """유저 정보를 업데이트할 때 비밀번호를 해시하여 저장"""
-        password = validated_data.pop("password", None)
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-
-        if password is not None:
-            instance.set_password(password)  # 비밀번호를 해시하여 설정
-        instance.save()
-        return instance
