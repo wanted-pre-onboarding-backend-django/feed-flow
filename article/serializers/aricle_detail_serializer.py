@@ -21,4 +21,17 @@ class ArticleDetailSerializer(ModelSerializer):
 
     class Meta:
         model = Article
-        fields = "__all__"
+        fields = [
+            "id",
+            "title",
+            "content",
+            "type",
+            "content_id",
+            "user",
+            "hashtag",
+            "created_at",
+            "updated_at",
+            "view_cnt",
+            "like_cnt",
+            "share_cnt",
+        ]

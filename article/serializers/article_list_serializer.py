@@ -1,6 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from article.models import Article, Hashtag
+from user.serializers import TinyUserSerializer
 
 
 class HashtagSerializer(serializers.ModelSerializer):
@@ -10,9 +11,12 @@ class HashtagSerializer(serializers.ModelSerializer):
 
 
 class ArticleListSerializer(ModelSerializer):
+    """게시물 목록 시리얼라이저"""
 
+    user = TinyUserSerializer(read_only=True)
     hashtag = HashtagSerializer(many=True, read_only=True)
 
+    # 유저와 해쉬태그는 이름만
     class Meta:
         model = Article
         fields = [
@@ -30,10 +34,9 @@ class ArticleListSerializer(ModelSerializer):
             "updated_at",
         ]
 
-    # 필드 커스텀을 위한 함수 to_representation함수(장고함수)
+    # 게시물 목록 API에선 content 는 최대 20자 까지만 포함됩니다.
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        # content 필드를 20자로 제한하여 반환
         representation["content"] = instance.content[:20] + (
             "..." if len(instance.content) > 20 else ""
         )
