@@ -33,7 +33,6 @@ services:
       - postgres
     restart: on-failure
 
-  # nginx 차후 적용
   nginx:
     container_name: nginx
     restart: always
