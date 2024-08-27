@@ -10,6 +10,10 @@ django-environ = "==0.11.2"
 drf-yasg = "==1.21.7"
 requests = "*"
 pyjwt = "*"
+uvicorn = "*"
+gunicorn = "*"
+psycopg2-binary = "*"
+whitenoise = "*"
 
 [dev-packages]
 flake8 = "==7.1.0"
