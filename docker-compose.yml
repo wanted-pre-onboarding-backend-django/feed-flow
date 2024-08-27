@@ -1,0 +1,49 @@
+volumes:
+  postgres: {}
+
+services:
+  postgres:
+    image: postgres:16.0-alpine
+    volumes:
+      - postgres:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    restart: on-failure
+
+  django:
+    container_name: django
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - DEV=true
+    # 실제 배포 때는 이미 완성된 migration을 가지고 migrate만 실행하는 것이 적합
+    command: >
+      bash -c "pipenv run python manage.py migrate &&
+      pipenv run gunicorn --config /app/config/gunicorn_config.py config.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - ENV=development
+    depends_on:
+      - postgres
+    restart: on-failure
+
+  nginx:
+    container_name: nginx
+    restart: always
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - .:/app
+    environment:
+      - TZ=Asia/Seoul
+    depends_on:
+      - django
+      - postgres
